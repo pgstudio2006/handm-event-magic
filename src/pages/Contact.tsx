@@ -59,13 +59,13 @@ const Contact = () => {
 
   const teamMembers = [
     {
-      name: "Rajesh Kumar",
-      role: "Founder & Lead Event Manager",
+      name: "Harshil Patel",
+      role: "Founder & CEO",
       image: teamMember1,
     },
     {
-      name: "Priya Sharma",
-      role: "Wedding Specialist & Coordinator",
+      name: "Mahi Patel",
+      role: "Creative Director",
       image: teamMember2,
     },
   ];
@@ -182,9 +182,14 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg mb-1">Phone</h3>
-                      <a href="tel:+919876543210" className="text-muted-foreground hover:text-primary smooth-transition">
-                        +91 98765 43210
-                      </a>
+                      <div className="space-y-1">
+                        <a href="tel:+919023706900" className="text-muted-foreground hover:text-primary smooth-transition block">
+                          +91 90237 06900
+                        </a>
+                        <a href="tel:+919998957490" className="text-muted-foreground hover:text-primary smooth-transition block">
+                          +91 99989 57490
+                        </a>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -211,7 +216,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-bold text-lg mb-1">Location</h3>
                       <p className="text-muted-foreground">
-                        Mumbai, Maharashtra, India
+                        Ahmedabad, Gujarat, India
                       </p>
                     </div>
                   </CardContent>
@@ -230,7 +235,7 @@ const Contact = () => {
                     className="w-full"
                   >
                     <a
-                      href="https://wa.me/919876543210?text=Hi!%20I%27d%20like%20to%20inquire%20about%20your%20event%20management%20services."
+                      href="https://wa.me/919023706900?text=Hi!%20I%27d%20like%20to%20inquire%20about%20your%20event%20management%20services."
                       target="_blank"
                       rel="noopener noreferrer"
                     >

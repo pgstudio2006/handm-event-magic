@@ -96,7 +96,7 @@ const Home = () => {
               Lifetime Memories
             </span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
+          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-secondary-foreground" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
             Professional event management for weddings, concerts, Navratri celebrations, and corporate events across India.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -105,7 +105,7 @@ const Home = () => {
                 Plan Your Event <ArrowRight className="ml-2" size={20} />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-secondary-foreground text-secondary-foreground hover:bg-secondary-foreground hover:text-secondary smooth-transition text-lg">
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-secondary-foreground text-secondary-foreground hover:bg-secondary-foreground hover:text-secondary smooth-transition text-lg" style={{ backdropFilter: "blur(2px)" }}>
               <Link to="/services">View Services</Link>
             </Button>
           </div>

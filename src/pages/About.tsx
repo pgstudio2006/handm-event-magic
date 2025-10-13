@@ -1,6 +1,8 @@
 import { Heart, Award, Users, Target } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import aboutImage from "@/assets/about-collage.jpg";
+import teamMember1 from "@/assets/team-member-1.jpg";
+import teamMember2 from "@/assets/team-member-2.jpg";
 
 const About = () => {
   const values = [
@@ -23,6 +25,21 @@ const About = () => {
       icon: Target,
       title: "Precision",
       description: "Meticulous planning and flawless execution for stress-free events.",
+    },
+  ];
+
+  const teamMembers = [
+    {
+      name: "Harshil Patel",
+      role: "Founder & CEO",
+      description: "Harshil leads HandM with a vision to create extraordinary celebrations.",
+      image: teamMember1,
+    },
+    {
+      name: "Mahi Patel",
+      role: "Creative Director",
+      description: "Mahi brings creativity and innovation to every event, ensuring each celebration reflects the unique personality of our clients.",
+      image: teamMember2,
     },
   ];
 
@@ -100,6 +117,39 @@ const About = () => {
                   <h3 className="text-xl font-bold mb-2">{value.title}</h3>
                   <p className="text-muted-foreground">{value.description}</p>
                 </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Meet Our Team</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              The passionate individuals behind HandM's success
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {teamMembers.map((member, index) => (
+              <Card key={index} className="overflow-hidden hover:shadow-xl smooth-transition">
+                <div className="flex flex-col md:flex-row">
+                  <div className="w-full md:w-1/3">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-64 md:h-full object-cover"
+                    />
+                  </div>
+                  <div className="w-full md:w-2/3 p-6">
+                    <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
+                    <p className="text-primary font-semibold mb-3">{member.role}</p>
+                    <p className="text-muted-foreground">{member.description}</p>
+                  </div>
+                </div>
               </Card>
             ))}
           </div>
