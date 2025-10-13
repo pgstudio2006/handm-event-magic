@@ -7,6 +7,15 @@ import marriageImage from "@/assets/service-marriage.jpg";
 import concertImage from "@/assets/service-concert.jpg";
 import navratriImage from "@/assets/service-navratri.jpg";
 import inaugurationImage from "@/assets/service-inauguration.jpg";
+import galleryWedding1 from "@/assets/gallery-wedding-1.jpg";
+import galleryWedding2 from "@/assets/gallery-wedding-2.jpg";
+import galleryWedding3 from "@/assets/gallery-wedding-3.jpg";
+import galleryConcert1 from "@/assets/gallery-concert-1.jpg";
+import galleryConcert2 from "@/assets/gallery-concert-2.jpg";
+import galleryNavratri1 from "@/assets/gallery-navratri-1.jpg";
+import galleryNavratri2 from "@/assets/gallery-navratri-2.jpg";
+import galleryInauguration1 from "@/assets/gallery-inauguration-1.jpg";
+import galleryInauguration2 from "@/assets/gallery-inauguration-2.jpg";
 
 const Home = () => {
   const services = [
@@ -57,6 +66,18 @@ const Home = () => {
     },
   ];
 
+  const galleryImages = [
+    { src: galleryWedding1, alt: "Traditional Indian Wedding Ceremony", category: "Wedding" },
+    { src: galleryConcert1, alt: "Live Concert Performance", category: "Concert" },
+    { src: galleryNavratri1, alt: "Navratri Garba Celebration", category: "Navratri" },
+    { src: galleryInauguration1, alt: "Corporate Inauguration Ceremony", category: "Inauguration" },
+    { src: galleryWedding2, alt: "Wedding Sangeet Dance", category: "Wedding" },
+    { src: galleryConcert2, alt: "Concert Stage Lighting", category: "Concert" },
+    { src: galleryNavratri2, alt: "Navratri Traditional Stage", category: "Navratri" },
+    { src: galleryInauguration2, alt: "Grand Inauguration Event", category: "Inauguration" },
+    { src: galleryWedding3, alt: "Wedding Mehndi Ceremony", category: "Wedding" },
+  ];
+
   return (
     <>
       {/* Hero Section */}
@@ -71,7 +92,7 @@ const Home = () => {
         <div className="relative z-10 container mx-auto px-4 lg:px-8 text-center text-secondary-foreground">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
             Turning Your Moments into
-            <span className="block gradient-gold bg-clip-text text-transparent">
+            <span className="block text-primary" style={{ textShadow: "3px 3px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)" }}>
               Lifetime Memories
             </span>
           </h1>
@@ -207,6 +228,39 @@ const Home = () => {
                   </div>
                 </CardContent>
               </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Our Event Gallery</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Glimpses of magical moments we've created across India
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {galleryImages.map((image, index) => (
+              <div
+                key={index}
+                className="group relative overflow-hidden rounded-lg aspect-video hover:shadow-2xl smooth-transition"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover group-hover:scale-110 smooth-transition"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 smooth-transition flex items-end justify-center p-6">
+                  <div className="text-secondary-foreground text-center">
+                    <p className="text-lg font-bold">{image.category}</p>
+                    <p className="text-sm opacity-90">{image.alt}</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
