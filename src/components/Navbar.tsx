@@ -3,20 +3,26 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, logout } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
-    { name: "Admin", path: "/admin" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -41,9 +47,20 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Button asChild variant="default" className="gradient-gold text-foreground hover:opacity-90 smooth-transition">
-              <Link to="/contact">Get Started</Link>
-            </Button>
+
+            {isAuthenticated ? (
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="gradient-gold text-foreground hover:opacity-90 smooth-transition"
+              >
+                Admin Logout
+              </Button>
+            ) : (
+              <Button asChild variant="default" className="gradient-gold text-foreground hover:opacity-90 smooth-transition">
+                <Link to="/admin/login">Admin Login</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -74,11 +91,22 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Button asChild className="gradient-gold text-foreground">
-                <Link to="/contact" onClick={() => setIsOpen(false)}>
-                  Get Started
-                </Link>
-              </Button>
+
+              {isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="gradient-gold text-foreground justify-start"
+                >
+                  Admin Logout
+                </Button>
+              ) : (
+                <Button asChild className="gradient-gold text-foreground">
+                  <Link to="/admin/login" onClick={() => setIsOpen(false)}>
+                    Admin Login
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         )}

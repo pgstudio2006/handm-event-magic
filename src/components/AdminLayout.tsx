@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   IndianRupee,
@@ -11,13 +11,18 @@ import {
   FileText,
   Settings,
   Menu,
-  X
+  X,
+  LogOut,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { username, logout } = useAuth();
 
   const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -32,6 +37,11 @@ const AdminLayout = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/admin/login");
+  };
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -85,12 +95,25 @@ const AdminLayout = () => {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-6 border-t">
+        <div className="p-6 border-t space-y-2">
+          <div className="flex items-center px-3 py-2 text-sm text-muted-foreground">
+            <User size={16} className="mr-2" />
+            Logged in as: {username}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-start"
+            onClick={handleLogout}
+          >
+            <LogOut size={16} className="mr-2" />
+            Logout
+          </Button>
           <Link
             to="/"
-            className="flex items-center px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors"
+            className="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors"
           >
-            <Settings size={20} className="mr-3" />
+            <Settings size={16} className="mr-2" />
             Back to Website
           </Link>
         </div>
@@ -117,9 +140,18 @@ const AdminLayout = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-muted-foreground">
-                Admin Portal
+              <div className="text-sm text-muted-foreground hidden sm:block">
+                Welcome back, {username}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="hidden sm:flex"
+              >
+                <LogOut size={16} className="mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
