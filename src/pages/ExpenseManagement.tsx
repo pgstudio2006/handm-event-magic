@@ -55,9 +55,11 @@ const expenseSchema = z.object({
   description: z.string().min(1, "Description is required"),
   amount: z.number().min(0, "Amount must be positive"),
   category: z.string().min(1, "Category is required"),
+  vendor: z.string().min(1, "Vendor is required"),
   payment_method: z.string().min(1, "Payment method is required"),
   date: z.string().min(1, "Date is required"),
-  notes: z.string().optional(),
+  receipt_number: z.string().optional(),
+  status: z.enum(["paid", "pending", "overdue"]).default("pending"),
 });
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
@@ -75,9 +77,11 @@ const ExpenseManagement = () => {
       description: "",
       amount: 0,
       category: "",
+      vendor: "",
       payment_method: "",
       date: new Date().toISOString().split('T')[0],
-      notes: "",
+      receipt_number: "",
+      status: "pending",
     },
   });
 
@@ -102,9 +106,11 @@ const ExpenseManagement = () => {
           description: data.description,
           amount: data.amount,
           category: data.category,
+          vendor: data.vendor,
           payment_method: data.payment_method,
           date: data.date,
-          notes: data.notes,
+          receipt_number: data.receipt_number || null,
+          status: data.status,
         });
         setEditingRecord(null);
       } else {
@@ -112,10 +118,11 @@ const ExpenseManagement = () => {
           description: data.description,
           amount: data.amount,
           category: data.category,
+          vendor: data.vendor,
           payment_method: data.payment_method,
           date: data.date,
-          notes: data.notes,
-          status: 'approved',
+          receipt_number: data.receipt_number || null,
+          status: data.status,
         });
       }
 
@@ -132,9 +139,11 @@ const ExpenseManagement = () => {
       description: record.description,
       amount: record.amount,
       category: record.category,
+      vendor: record.vendor,
       payment_method: record.payment_method,
       date: record.date,
-      notes: record.notes || "",
+      receipt_number: record.receipt_number || "",
+      status: record.status || "pending",
     });
     setIsAddDialogOpen(true);
   };
@@ -160,9 +169,9 @@ const ExpenseManagement = () => {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      approved: 'default',
+      paid: 'default',
       pending: 'secondary',
-      rejected: 'destructive',
+      overdue: 'destructive',
     } as const;
 
     return (
@@ -281,6 +290,35 @@ const ExpenseManagement = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="vendor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vendor</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Vendor or supplier name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="receipt_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Receipt Number (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., RCPT-2025-001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="payment_method"
                     render={({ field }) => (
                       <FormItem>
@@ -320,13 +358,22 @@ const ExpenseManagement = () => {
 
                 <FormField
                   control={form.control}
-                  name="notes"
+                  name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Additional notes..." {...field} />
-                      </FormControl>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="overdue">Overdue</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

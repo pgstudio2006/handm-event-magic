@@ -291,6 +291,35 @@ const EventManagement = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="customer_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Customer Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Full name of customer" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="customer_phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Customer Phone</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="10-digit phone" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="customer_email"
                     render={({ field }) => (
                       <FormItem>

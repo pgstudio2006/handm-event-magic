@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -45,11 +46,11 @@ import { useReceipts, useCustomers } from "@/hooks/useSupabase";
 const receiptSchema = z.object({
   receipt_number: z.string().min(1, "Receipt number is required"),
   customer_name: z.string().min(1, "Customer name is required"),
+  event_name: z.string().min(1, "Event name is required"),
   amount: z.number().min(0, "Amount must be positive"),
-  description: z.string().min(1, "Description is required"),
   payment_method: z.string().min(1, "Payment method is required"),
-  issued_date: z.string().min(1, "Issue date is required"),
-  notes: z.string().optional(),
+  date: z.string().min(1, "Date is required"),
+  status: z.enum(["paid", "pending"]).default("paid"),
 });
 
 type ReceiptFormData = z.infer<typeof receiptSchema>;
@@ -61,24 +62,26 @@ const ReceiptSystem = () => {
   const [editingReceipt, setEditingReceipt] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string>("");
 
   const form = useForm<ReceiptFormData>({
     resolver: zodResolver(receiptSchema),
     defaultValues: {
       receipt_number: "",
       customer_name: "",
+      event_name: "",
       amount: 0,
-      description: "",
       payment_method: "",
-      issued_date: new Date().toISOString().split('T')[0],
-      notes: "",
+      date: new Date().toISOString().split('T')[0],
+      status: "paid",
     },
   });
 
   const filteredReceipts = receipts?.filter(receipt => {
     const matchesSearch = receipt.receipt_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          receipt.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         receipt.description.toLowerCase().includes(searchTerm.toLowerCase());
+                         receipt.event_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === "all" || receipt.status === filterStatus;
     return matchesSearch && matchesFilter;
   }) || [];
@@ -88,34 +91,40 @@ const ReceiptSystem = () => {
 
   const onSubmit = async (data: ReceiptFormData) => {
     try {
+      setSaving(true);
+      setSubmitError("");
       if (editingReceipt) {
         await update(editingReceipt.id, {
           receipt_number: data.receipt_number,
           customer_name: data.customer_name,
+          event_name: data.event_name,
           amount: data.amount,
-          description: data.description,
           payment_method: data.payment_method,
-          issued_date: data.issued_date,
-          notes: data.notes,
+          date: data.date,
+          status: data.status,
         });
         setEditingReceipt(null);
       } else {
         await add({
           receipt_number: data.receipt_number,
           customer_name: data.customer_name,
+          event_name: data.event_name,
           amount: data.amount,
-          description: data.description,
           payment_method: data.payment_method,
-          issued_date: data.issued_date,
-          notes: data.notes,
-          status: 'issued',
+          date: data.date,
+          status: data.status,
         });
       }
 
       form.reset();
       setIsAddDialogOpen(false);
     } catch (error) {
-      console.error('Error saving receipt:', error);
+      const message = error instanceof Error ? error.message : 'Failed to save receipt';
+      console.error('Error saving receipt:', message);
+      setSubmitError(message);
+    }
+    finally {
+      setSaving(false);
     }
   };
 
@@ -124,11 +133,11 @@ const ReceiptSystem = () => {
     form.reset({
       receipt_number: receipt.receipt_number,
       customer_name: receipt.customer_name,
+      event_name: receipt.event_name,
       amount: receipt.amount,
-      description: receipt.description,
       payment_method: receipt.payment_method,
-      issued_date: receipt.issued_date,
-      notes: receipt.notes || "",
+      date: receipt.date,
+      status: receipt.status || "paid",
     });
     setIsAddDialogOpen(true);
   };
@@ -163,9 +172,8 @@ const ReceiptSystem = () => {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      issued: 'default',
-      cancelled: 'destructive',
-      refunded: 'secondary',
+      paid: 'default',
+      pending: 'secondary',
     } as const;
 
     return (
@@ -220,6 +228,11 @@ const ReceiptSystem = () => {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {submitError && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{submitError}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -292,27 +305,13 @@ const ReceiptSystem = () => {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Payment for event services, etc." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="issued_date"
+                    name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Issue Date</FormLabel>
+                        <FormLabel>Date</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
@@ -324,12 +323,19 @@ const ReceiptSystem = () => {
 
                 <FormField
                   control={form.control}
-                  name="notes"
+                  name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
+                      <FormLabel>Status</FormLabel>
                       <FormControl>
-                        <Input placeholder="Additional notes..." {...field} />
+                        <select
+                          className="w-full p-2 border rounded-md"
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        >
+                          <option value="paid">Paid</option>
+                          <option value="pending">Pending</option>
+                        </select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -348,8 +354,15 @@ const ReceiptSystem = () => {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">
-                    {editingReceipt ? 'Update' : 'Create'} Receipt
+                  <Button type="submit" disabled={saving}>
+                    {saving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>{editingReceipt ? 'Update' : 'Create'} Receipt</>
+                    )}
                   </Button>
                 </div>
               </form>
@@ -426,7 +439,7 @@ const ReceiptSystem = () => {
                 <TableHead>Receipt Number</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>Event</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
@@ -442,9 +455,9 @@ const ReceiptSystem = () => {
                     <TableCell className="font-semibold text-green-600">
                       {formatCurrency(receipt.amount)}
                     </TableCell>
-                    <TableCell>{receipt.description}</TableCell>
+                    <TableCell>{receipt.event_name}</TableCell>
                     <TableCell>{receipt.payment_method}</TableCell>
-                    <TableCell>{receipt.issued_date}</TableCell>
+                    <TableCell>{receipt.date}</TableCell>
                     <TableCell>{getStatusBadge(receipt.status)}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
